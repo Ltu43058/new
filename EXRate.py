@@ -84,7 +84,7 @@ def cash_exrate_sixMonth(code1) -> "USA":
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code1}')
     currency = dfs[0].iloc[:, 0:6] #獲取前6個欄位
     currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
-    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+))')
+    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
     currency = currency.iloc[::-1]
     if currency["現金買入"][0] == "-" or currency["現金買入"][0] == 0.0:
         return "現金匯率無資料可分析"
@@ -104,7 +104,7 @@ def spot_exrate_sixMonth(code2):
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code2}')
     currency = dfs[0].iloc[:, 0:6] #獲取前6個欄位
     currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
-    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+))')
+    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
     currency = currency.iloc[::-1]
     if currency["即期買入"][0] == "-" or currency["即期買入"][0] == 0.0:
         return "即期匯率無資料可分析"
