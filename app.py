@@ -99,7 +99,7 @@ def handle_message(event):
     user_name = profile.display_name #使用者名稱
     
     ######################## 匯率區 ##############################################    
-    if re.match("匯率大小事", msg):
+    if re.match("匯率查詢", msg):
         btn_msg = Msg_Template.stock_reply_rate()
         line_bot_api.push_message(uid, btn_msg)
         return 0
@@ -169,7 +169,7 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
     ######################## 使用說明 選單 油價查詢################################
-    if event.message.text == "油價報你知":
+    if event.message.text == "油價查詢":
         content = oil_price()
         line_bot_api.reply_message(
             event.reply_token,
@@ -346,7 +346,7 @@ def handle_message(event):
                     # print(dataList[i][k])
                     look_stock_price(dataList[i][k]['favorite_stock'], dataList[i][k]['condition'], dataList[i][k]['price'], dataList[i][k]['userID'])
                     # look_stock_price(stock='2002', condition='>', price=31)
-        schedule.every(30).seconds.do(job).tag('daily-tasks-stock'+uid,'second') #每10秒執行一次
+        schedule.every(10).seconds.do(job).tag('daily-tasks-stock'+uid,'second') #每10秒執行一次
         #schedule.every().hour.do(job) #每小時執行一次
         #schedule.every().day.at("17:19").do(job) #每天9點30執行一次
         #schedule.every().monday.do(job) #每週一執行一次
@@ -402,7 +402,7 @@ def handle_message(event):
             for user_data in dataList:
                 for entry in user_data:
                     look_currency_price(entry['favorite_currency'], entry['condition'], entry['price'], entry['userID'])           
-        schedule.every(30).seconds.do(job_currency) #每10秒執行一次
+        schedule.every(10).seconds.do(job_currency) #每10秒執行一次
         #schedule.every(30).seconds.do(job_currency) #每10秒執行一次
         #schedule.every().hour.do(job) #每小時執行一次
         #schedule.every().day.at("20:00").do(job) #每天9點30執行一次
