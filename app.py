@@ -270,10 +270,10 @@ def handle_message(event):
         return 0
     
     
-    if event.message.text[:1].upper() == "K":
+    if event.message.text[:2].upper() == "@K":
         input_word = event.message.text.replace(" ", "")
-        stock_name = input_word[1:5] #2330
-        start_date = input_word[5:] #2020-01-01
+        stock_name = input_word[2:6] #2330
+        start_date = input_word[6:] #2020-01-01
         content = plot_stock_k_chart(IMGUR_CLIENT_ID, stock_name, start_date)
         message = ImageSendMessage(original_content_url = content, preview_image_url = content)
         line_bot_api.reply_message(event.reply_token, message)
