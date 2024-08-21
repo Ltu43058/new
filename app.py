@@ -258,8 +258,8 @@ def handle_message(event):
                                 text='開始玩'
                             ),
                             URIAction(
-                                label='財經新聞',
-                                uri='https://tw.stock.yahoo.com/news/'
+                                label='PChome',
+                                uri='https://liff.line.me/2006134059-NxYlaGm6'
                             ),
                             URIAction(
                                 label='粉絲團',
