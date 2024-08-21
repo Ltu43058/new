@@ -300,8 +300,8 @@ def handle_message(event):
                                 uri='https://www.ptt.cc/bbs/Finance/index.html'
                             ),
                             URIAction(
-                                label='youtube 程式教學分享頻道',
-                                uri='https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA'
+                                label='youtube TON',
+                                uri='https://liff.line.me/2006134059-g17nPVJQ'
                             )
                         ]
                     )
