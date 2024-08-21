@@ -270,7 +270,7 @@ def handle_message(event):
         return 0
     
     
-    if event.message.text[:2].upper() == "K":
+    if event.message.text[:1].upper() == "K":
         input_word = event.message.text.replace(" ", "")
         stock_name = input_word[1:5] #2330
         start_date = input_word[5:] #2020-01-01
