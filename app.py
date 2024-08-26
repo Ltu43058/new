@@ -41,7 +41,7 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_form = '2020-01-01'
         mpf.plot(df, type = 'candle', may = (5, 20), volume = True, ylabel = stock.upper() + ' Price', savefig = 'testsave.png')
 
         PATH = "testsave.png"
-        im = pyimgur.Image(IMGUR_CLIENT_ID)
+        im = pyimgur.Imgur(IMGUR_CLIENT_ID)
         uploaded_image = im.upload_image(PATH, title = stock + " candlestick chart")
         print(f"圖片上傳成功: {uploaded_image.link}")
         return uploaded_image.link
