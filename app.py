@@ -14,19 +14,22 @@ import Msg_Template
 import EXRate
 import mongodb
 import twder
+import time
+import json
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "41cb541b1307080"
+access_token = '5X9MrXzD7lqW7fl6p1ZjM0mMcKwGrfU+KbTHMUJ0bNzICYlNYX2O9QmWFU1mFFaLc8A6K365aQA5YM8nwR+enYFhpLEDMOAJl0KXsLomKMb11EM9srF1AOap+zJDbQIAfQHOZpB4RlzA9njkPrpwmQdB04t89/1O/w1cDnyilFU='
 
 import yfinance as yf
 import mplfinance as mpf
 import pyimgur
 
-def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_from = '2020-01-01'):
+def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_form = '2020-01-01'):
     stock = str(stock) + ".TW"
     try:
         print(f"正在獲取股票數據: {stock}")
-        df = yf.download(stock, start = date_from)
+        df = yf.download(stock, start = date_form)
 
         if df is None or df.empty:
             print(f"未能獲取到股票數據，可能是因為股票代碼部正確或數據來源問題。")
@@ -39,11 +42,25 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_from = '2020-01-01'
         im = pyimgur.Image(IMGUR_CLIENT_ID)
         uploaded_image = im.upload_image(PATH, title = stock + " candlestick chart")
         print(f"圖片上傳成功: {uploaded_image.link}")
-        return uploaded_image.link
+        return uploaded_image.link_big_square
     
     except Exception as e:
         print(f"錯誤: {e}")
-        return None 
+        return None
+
+def reply_image(msg, rk, token):
+    headers = {'Authorization':f'Bearer {token}','Content-Type':'application/json'}
+    body = {
+        'replyToken':rk,
+        'messages':[{
+            'type': 'image',
+            'originalContentUrl': msg,
+            'previewImageUrl': msg
+        }]
+    }
+    req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers,data=json.dumps(body).encode('utf-8'))
+    print(req.text)
+
 
 # 抓使用者設定它關心的匯率
 def cache_users_currency():
@@ -110,8 +127,17 @@ def callback():
     # handle webhook body
     try:
         handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
+        json_data = json.loads(body)
+        reply_token = json_data['events'][0]['replyToken']
+        user_id = json_data['events'][0]['source']['userId']
+        print(json_data)
+        if 'message' in json_data['events'][0]:
+            if json_data['events'][0]['message']['type'] == 'text':
+                text = json_data['events'][0]['message']['text']
+                if text == '雷達回波圖' or text == '雷達回波':
+                    reply_image(f'https://cwbopendata.s3.ap-northease-1.amazonaws.com/MSC/0-A0058-003.png?{time.time_ns()}', reply_token, access_token)
+    except:
+        print('error')
 
     return 'OK'
 # 處理訊息
