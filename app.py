@@ -44,7 +44,7 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_form = '2020-01-01'
         im = pyimgur.Image(IMGUR_CLIENT_ID)
         uploaded_image = im.upload_image(PATH, title = stock + " candlestick chart")
         print(f"圖片上傳成功: {uploaded_image.link}")
-        return uploaded_image.link_big_square
+        return uploaded_image.link
     
     except Exception as e:
         print(f"錯誤: {e}")
