@@ -16,10 +16,12 @@ import mongodb
 import twder
 import time
 import json
+import place
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "41cb541b1307080"
 access_token = '5X9MrXzD7lqW7fl6p1ZjM0mMcKwGrfU+KbTHMUJ0bNzICYlNYX2O9QmWFU1mFFaLc8A6K365aQA5YM8nwR+enYFhpLEDMOAJl0KXsLomKMb11EM9srF1AOap+zJDbQIAfQHOZpB4RlzA9njkPrpwmQdB04t89/1O/w1cDnyilFU='
+mat_d = {}
 
 import yfinance as yf
 import mplfinance as mpf
@@ -422,6 +424,20 @@ def handle_message(event):
         while True: 
             schedule.run_pending()
             time.sleep(1)
+
+
+    ################################################weather#######################################
+    if re.match('最新氣象|查詢天氣|天氣查詢|weather|Weather',msg):
+        content=place.img_Carousel()
+        line_bot_api.reply_message(event.reply_token, content)
+    
+    ################################################1.即時天氣-OK#######################################
+    if re.match('即時天氣|即時氣象',msg):
+        mat_d[uid]='即時天氣'
+        content=place.quick_reply_weather(mat_d[uid])
+        line_bot_api.reply_message(event.reply_token,content)
+        return 0
+
     ################################################匯率推播#######################################
     if re.match("匯率推播", msg):
         import schedule
