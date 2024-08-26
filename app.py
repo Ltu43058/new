@@ -27,24 +27,24 @@ import yfinance as yf
 import mplfinance as mpf
 import pyimgur
 
-def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_form = '2020-01-01'):
+def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_from = '2020-01-01'):
     stock = str(stock) + ".TW"
     try:
         print(f"正在獲取股票數據: {stock}")
-        df = yf.download(stock, start = date_form)
+        df = yf.download(stock, start = date_from)
 
         if df is None or df.empty:
             print(f"未能獲取到股票數據，可能是因為股票代碼部正確或數據來源問題。")
             return None
         
         print("股票數據獲取成功，開始繪製K線圖.....")
-        mpf.plot(df, type = 'candle', may = (5, 20), volume = True, ylabel = stock.upper() + ' Price', savefig = 'testsave.png')
+        mpf.plot(df, type = 'candle', mav = (5, 20), volume = True, ylabel = stock.upper() + ' Price', savefig = 'testsave.png')
 
         PATH = "testsave.png"
         im = pyimgur.Imgur(IMGUR_CLIENT_ID)
         uploaded_image = im.upload_image(PATH, title = stock + " candlestick chart")
         print(f"圖片上傳成功: {uploaded_image.link}")
-        return uploaded_image.link_big_square
+        return uploaded_image.link
     
     except Exception as e:
         print(f"錯誤: {e}")
