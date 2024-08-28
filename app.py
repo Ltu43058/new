@@ -37,7 +37,7 @@ def preprocess_image(image):
     image = image.resize((28, 28))
     image = np.array(image)
     image = image / 255.0
-    image = np.expand_dims(image, axiz=0)
+    image = np.expand_dims(image, axis=0)
     image = np.expand_dims(image, axis=-1)
     return image
 
