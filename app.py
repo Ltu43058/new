@@ -17,11 +17,29 @@ import twder
 import time
 import json
 import place
+import numpy as np
+from tensorflow.keras.models import load_model
+from PIL import Image
+import io
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "41cb541b1307080"
 access_token = '5X9MrXzD7lqW7fl6p1ZjM0mMcKwGrfU+KbTHMUJ0bNzICYlNYX2O9QmWFU1mFFaLc8A6K365aQA5YM8nwR+enYFhpLEDMOAJl0KXsLomKMb11EM9srF1AOap+zJDbQIAfQHOZpB4RlzA9njkPrpwmQdB04t89/1O/w1cDnyilFU='
 mat_d = {}
+
+#***********************CNN***************************#
+# 加載已訓練的CNN模型
+model = load_model('mnist_cnn_model.h5')
+line_bot_api = LineBotApi('5X9MrXzD7lqW7fl6p1ZjM0mMcKwGrfU+KbTHMUJ0bNzICYlNYX2O9QmWFU1mFFaLc8A6K365aQA5YM8nwR+enYFhpLEDMOAJl0KXsLomKMb11EM9srF1AOap+zJDbQIAfQHOZpB4RlzA9njkPrpwmQdB04t89/1O/w1cDnyilFU=')
+
+def preprocess_image(image):
+    image = image.convert('L')
+    image = image.resize((28, 28))
+    image = np.array(image)
+    image = image / 255.0
+    image = np.expand_dims(image, axiz=0)
+    image = np.expand_dims(image, axis=-1)
+    return image
 
 import yfinance as yf
 import mplfinance as mpf
@@ -124,22 +142,27 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    app.logger.info("Request body: " + body) #app.logger.info(f"Request body: {body}")
 
     # handle webhook body
+    # try:
+    #     handler.handle(body, signature)
+    #     json_data = json.loads(body)
+    #     reply_token = json_data['events'][0]['replyToken']
+    #     user_id = json_data['events'][0]['source']['userId']
+    #     print(json_data)
+    #     if 'message' in json_data['events'][0]:
+    #         if json_data['events'][0]['message']['type'] == 'text':
+    #             text = json_data['events'][0]['message']['text']
+    #             if text == '雷達回波圖' or text == '雷達回波':
+    #                 reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}', reply_token, access_token)
+    # except:
+    #     print('error')
+
     try:
         handler.handle(body, signature)
-        json_data = json.loads(body)
-        reply_token = json_data['events'][0]['replyToken']
-        user_id = json_data['events'][0]['source']['userId']
-        print(json_data)
-        if 'message' in json_data['events'][0]:
-            if json_data['events'][0]['message']['type'] == 'text':
-                text = json_data['events'][0]['message']['text']
-                if text == '雷達回波圖' or text == '雷達回波':
-                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}', reply_token, access_token)
-    except:
-        print('error')
+    except InvalidSignatureError:
+        abort(400)
 
     return 'OK'
 # 處理訊息
@@ -426,10 +449,29 @@ def handle_message(event):
             time.sleep(1)
 
 
+    ################################################CNN#######################################
+    msg = event.message.text
+
+    if re.match('圖像辨識', msg):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='請上傳一張圖片進行圖像辨識。')
+        )
+
+    #######################################weather quake#######################################
+    if re.match('雷達回波', msg):
+        url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
+        radar_img = ImageSendMessage(
+            original_content_url=url,
+            preview_image_url=url
+        )
+        line_bot_api.reply_message(event.reply_token, radar_img)
+
     ################################################weather#######################################
     if re.match('最新氣象|查詢天氣|天氣查詢|weather|Weather',msg):
         content=place.img_Carousel()
         line_bot_api.reply_message(event.reply_token, content)
+        return 0
     
     ################################################1.即時天氣-OK#######################################
     if re.match('即時天氣|即時氣象',msg):
@@ -437,6 +479,7 @@ def handle_message(event):
         content=place.quick_reply_weather(mat_d[uid])
         line_bot_api.reply_message(event.reply_token,content)
         return 0
+
 
     ################################################匯率推播#######################################
     if re.match("匯率推播", msg):
@@ -496,6 +539,24 @@ def handle_message(event):
             schedule.run_pending()
             time.sleep(1)
 
+
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    #獲取圖片內容
+    message_content = line_bot_api.get_message_content(event.message.id)
+    image = Image.open(io.BytesIO(message_content.content))
+    #預處理圖片
+    image = preprocess_image(image)
+
+    #執行CNN模型進行預測
+    prediction = model.predict(image)
+    digit = np.argmax(prediction)
+
+    #回傳預測結果
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=f'預測的數字是: {digit}')
+    )
 
 import os
 if __name__ == "__main__":
