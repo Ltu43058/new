@@ -19,7 +19,7 @@ import json
 import place
 
 app = Flask(__name__)
-IMGUR_CLIENT_ID = '41cb541b1307080'
+IMGUR_CLIENT_ID = "41cb541b1307080"
 access_token = '5X9MrXzD7lqW7fl6p1ZjM0mMcKwGrfU+KbTHMUJ0bNzICYlNYX2O9QmWFU1mFFaLc8A6K365aQA5YM8nwR+enYFhpLEDMOAJl0KXsLomKMb11EM9srF1AOap+zJDbQIAfQHOZpB4RlzA9njkPrpwmQdB04t89/1O/w1cDnyilFU='
 mat_d = {}
 
@@ -27,11 +27,11 @@ import yfinance as yf
 import mplfinance as mpf
 import pyimgur
 
-def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_from = '2020-01-01'):
+def plot_stock_k_chart(IMGUR_CLIENT_ID, stock = "0050", date_form = '2020-01-01'):
     stock = str(stock) + ".TW"
     try:
         print(f"正在獲取股票數據: {stock}")
-        df = yf.download(stock, start = date_from)
+        df = yf.download(stock, start = date_form)
 
         if df is None or df.empty:
             print(f"未能獲取到股票數據，可能是因為股票代碼部正確或數據來源問題。")
